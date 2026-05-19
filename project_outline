@@ -1,0 +1,21 @@
+Project outline:
+
+·   It should have Git-GitHub + Docker + Kubernetes + Jenkins + AWS (S3 + Lambda). Consider some HPC problem (involving complex computations). Data can come from S3, pre-processes using Lambda, and then do HPC work and store results back in S3/DynamoDB. CI/CD pipeline can be created using above tools.
+
+·   Clustering -> Automation tools -> use tools like Ansible and etc..
+
+·   Kubernetes->Autoscaling tools->create load in your application
+
+·   If infra related … ex: Hadoop -> security,firewall,VPN
+
+·   Filesystem HPC clusters in backend -> expandable storage
+
+·   AI based libraries
+
+·   Try to add more tools and software also add related hardware requirement for that
+
+(Ex: ELK Stack,Wazuh,…)
+
+Most imp: Storage and Backup Management(failure,restore,backup)
+
+If primary system fails then backup plan?
