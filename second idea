@@ -1,0 +1,31 @@
+Phased Project Plan
+Phase 1 — Data Pipeline
+
+Set up Kafka with Docker Compose
+Write a producer that streams Reddit/news data
+Write a Flink/Spark consumer to preprocess text
+
+Phase 2 — Sentiment Model 
+
+Fine-tune or deploy a pre-trained RoBERTa model
+Export to ONNX for optimized inference
+Wrap in a FastAPI microservice
+
+Phase 3 — HPC Integration 
+
+Enable batched inference for throughput
+Benchmark latency: ONNX vs raw PyTorch vs TensorRT
+Document speedup results 
+
+Phase 4 — DevOps Layer
+
+Dockerize all services
+Deploy on Kubernetes (Minikube)
+Set up GitHub Actions for CI/CD
+Add MLflow for model versioning
+
+Phase 5 — Monitoring & Demo
+
+Prometheus metrics + Grafana dashboard
+Live demo with real streaming data
+Write report with architecture diagrams & benchmarks
