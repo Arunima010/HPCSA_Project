@@ -1,0 +1,235 @@
+# Real-Time Fraud Detection Engine on HPC Cloud
+
+## Overview
+
+The Real-Time Fraud Detection Engine on HPC Cloud is a distributed fraud detection platform designed to simulate how modern financial institutions detect fraudulent transactions in real time. The project combines **High Performance Computing (HPC), Machine Learning, DevOps, and Cybersecurity to build a scalable and secure transaction processing system.
+
+Instead of relying on a large production cluster, the system is deployed on a 3-node HPC environment consisting of one master node and two compute nodes, making it suitable for academic demonstrations while preserving real-world architecture.
+
+-> Project Objectives
+
+- Build a secure HPC cluster for distributed processing.
+- Stream banking transactions in real time.
+- Detect fraudulent transactions using an AI model.
+- Provide live monitoring and alerting dashboards.
+- Automate deployment using a CI/CD pipeline.
+- Demonstrate enterprise-grade security and backup strategies.
+
+-> System Architecture
+
+                 Users
+                   │
+           WireGuard VPN
+                   │
+             Master Node
+     ┌─────────────────────────┐
+     │ Gitea                   │
+     │ SLURM Scheduler         │
+     │ NFS Shared Storage      │
+     │ Grafana                 │
+     │ PostgreSQL              │
+     │ Wazuh                   │
+     └────────────┬────────────┘
+                  │
+        Internal Cluster Network
+          ┌────────────┴────────────┐
+          │                         │
+     Compute Node 1          Compute Node 2
+     Feature Engineering      ML Inference
+        (Apache Flink)          (XGBoost)
+          │                         │
+          └────────────┬────────────┘
+                       │
+                  Fraud Score
+                       │
+            PostgreSQL + Dashboard
+
+-> Technology Stack
+
+In HPC;
+- SLURM
+- Warewulf (PXE Boot)
+- MPI
+- NFS
+
+In Machine Learning;
+- Python
+- XGBoost
+- SHAP
+- MLflow
+
+In Streaming;
+- Apache Kafka
+- Apache Flink
+
+In Backend;
+- FastAPI
+- PostgreSQL
+
+In DevOps;
+- Docker
+- Gitea
+- Harbor
+- Trivy
+- Ruff
+- Pytest
+
+In Security;
+- WireGuard VPN
+- nftables Firewall
+- FreeIPA
+- SSH Key Authentication
+- Google Authenticator (2FA)
+- Wazuh
+
+Monitoring;
+- Grafana
+- Wazuh Dashboard
+
+Backup;
+- Cron
+- rsync
+- pg_dump
+- rclone
+
+-> Workflow
+
+1. Banking transactions are streamed into Apache Kafka.
+2. Apache Flink performs real-time feature engineering.
+3. The feature vector is processed by an XGBoost fraud detection model.
+4. A fraud probability score is generated.
+5. Based on configurable thresholds:
+   - High Risk → Transaction Blocked
+   - Medium Risk → Manual Review
+   - Low Risk → Transaction Approved
+6. Results are stored in PostgreSQL.
+7. Grafana displays real-time alerts.
+8. Analyst feedback is stored for future model retraining.
+
+-> HPC Cluster Design
+
+The cluster consists of:
+
+- **Master Node**
+  - SLURM Controller
+  - Gitea
+  - PostgreSQL
+  - Grafana
+  - Shared NFS Storage
+
+- **Compute Node 1**
+  - Apache Flink
+  - Feature Engineering
+
+- **Compute Node 2**
+  - XGBoost Inference
+  - Parallel Processing
+
+Compute nodes boot using PXE through Warewulf, allowing centralized management and rapid deployment.
+
+->  Security Features
+
+- WireGuard VPN for secure remote access
+- nftables firewall with default-deny policy
+- Compute nodes isolated from external networks
+- SSH Key Authentication
+- Two-Factor Authentication
+- FreeIPA Role-Based Access Control
+- Wazuh Security Monitoring
+- Continuous vulnerability scanning
+
+-> Machine Learning Pipeline
+
+Dataset:
+- IEEE-CIS Fraud Detection Dataset
+- PaySim Transaction Dataset
+
+Model:
+- XGBoost
+
+Explainability:
+- SHAP
+
+Model Management:
+- MLflow
+
+Thresholds:
+- Score > 0.85 → Fraud
+- Score 0.60–0.85 → Review
+- Score < 0.60 → Legitimate
+
+-> CI/CD Pipeline
+
+Developer
+     │
+ git push
+     │
+  Gitea
+     │
+───────────────
+│ Run Tests   │
+│ Ruff        │
+│ Bandit      │
+│ Trivy Scan  │
+───────────────
+     │
+ Build Docker Image
+     │
+ Harbor Registry
+     │
+ SLURM Deployment
+     │
+ Updated Inference Service
+
+->  Monitoring
+
+Grafana provides:
+
+- Transaction throughput
+- Fraud rate
+- Model latency
+- CPU utilization
+- Memory usage
+- SLURM job status
+- Cluster health
+
+Wazuh monitors:
+
+- Failed SSH attempts
+- File integrity
+- Vulnerability detection
+- Compliance reports
+- Unauthorized user activity
+
+-> Backup Strategy
+
+- PostgreSQL database backup using `pg_dump`
+- Model backup using `rsync`
+- Configuration stored in Git
+- Off-site backup using `rclone`
+
+-> Key Features
+
+- Distributed HPC processing
+- Real-time fraud detection
+- AI-powered transaction scoring
+- Secure VPN-based infrastructure
+- Automated CI/CD deployment
+- Enterprise-grade monitoring
+- Explainable AI using SHAP
+- Continuous model improvement
+- Automated backup and recovery
+
+-> Future Enhancements
+
+- Kubernetes-based deployment
+- GPU-accelerated inference
+- Multi-node HPC scaling
+- Deep Learning fraud detection
+- Auto-scaling cluster
+- Real-time email/SMS alerts
+- Multi-bank transaction support
+
+-> Conclusion
+
+This project demonstrates how High Performance Computing, Machine Learning, DevOps, and Cybersecurity can be integrated to build a secure, scalable, and intelligent fraud detection platform. Although implemented on a small HPC cluster, the architecture closely mirrors production systems used by modern financial institutions, making it an effective academic and practical demonstration of enterprise-grade distributed computing.
