@@ -1,0 +1,13 @@
+============================================================
+Loading cleaned dataset...
+============================================================
+Dataset Shape: (590540, 112)
+Features: (590540, 110)
+Target: (590540,)
+Encoding 3 categorical columns...
+Encoding Complete.
+
+Training Shape : (472432, 110)
+Validation Shape : (118108, 110)
+
+Training datasets saved successfully.

@@ -1,0 +1,13 @@
+======================================================================
+Loading merged dataset...
+======================================================================
+Original Shape: (590540, 434)
+After dropping sparse columns: (590540, 112)
+Numeric Columns: 109
+Categorical Columns: 3
+
+Remaining Missing Values
+0
+
+Saved cleaned_dataset.csv
+Final Shape: (590540, 112)

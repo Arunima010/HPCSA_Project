@@ -1,0 +1,33 @@
+======================================================================
+Loading Training Data...
+======================================================================
+Training Shape : (472432, 110)
+Validation Shape : (118108, 110)
+
+Training XGBoost Model...
+Training Completed.
+
+Evaluating Model...
+
+Accuracy : 0.9802638263284451
+Precision: 0.9152073732718894
+Recall : 0.4805226227921607
+F1 : 0.6301761066158972
+ROC-AUC : 0.9437757408883299
+
+Confusion Matrix
+[[113791    184]
+ [  2147   1986]]
+
+Classification Report
+              precision    recall  f1-score   support
+
+         0.0       0.98      1.00      0.99    113975
+         1.0       0.92      0.48      0.63      4133
+
+    accuracy                           0.98    118108
+   macro avg       0.95      0.74      0.81    118108
+weighted avg       0.98      0.98      0.98    118108
+
+
+Model Saved Successfully.

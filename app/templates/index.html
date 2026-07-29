@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>HPC Fraud Detection Platform</title>
+</head>
+
+<body>
+
+<h1>HPC Fraud Detection Platform</h1>
+
+<form action="/predict" method="post">
+
+<label>Transaction Amount</label><br>
+<input type="number" name="amount"><br><br>
+
+<label>Card Type</label><br>
+<select name="card">
+
+<option>Visa</option>
+<option>MasterCard</option>
+<option>Discover</option>
+
+</select>
+
+<br><br>
+
+<label>Device Type</label><br>
+
+<select name="device">
+
+<option>Desktop</option>
+<option>Mobile</option>
+
+</select>
+
+<br><br>
+
+<label>Browser</label><br>
+
+<select name="browser">
+
+<option>Chrome</option>
+<option>Firefox</option>
+<option>Edge</option>
+
+</select>
+
+<br><br>
+
+<label><b>Prediction Mode<b></label><br>
+
+<input type="radio" name="mode" value="random" checked>Random Transaction<br>
+
+<input type="radio" name="mode" value="fraud" checked>Known Fraud Sample<br>
+
+<input type="radio" name="mode" value="legitimate" checked>Known Legitimate Sample<br><br>
+
+<input type="submit" value="Predict Fraud">
+
+</form>
+
+</body>
+</html>

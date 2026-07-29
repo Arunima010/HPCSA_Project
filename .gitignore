@@ -1,0 +1,15 @@
+*.csv
+
+*.zip
+
+*.joblib
+
+*.pkl
+
+data/
+
+results/
+
+archive/
+
+models/

@@ -1,0 +1,22 @@
+Here's how I'd break this project into clear phases:
+
+Phase 1 — Core HPC problem
+
+    Matrix multiplication / N-body simulation using MPI + OpenMP
+    Image processing pipeline (parallel FFT or compression)
+    Weather/climate simulation with distributed data Pick something computationally heavy so the "HPC" angle is genuine.
+
+Phase 2 — Data pipeline on AWS S3 → Lambda (preprocess/filter) → my HPC compute → results back to S3/DynamoDB. This gives us a real data flow to demo.
+
+Phase 3 — CI/CD + Containers Git push → Jenkins triggers → Docker image built → pushed to registry → deployed on Kubernetes. Add Ansible for provisioning the nodes. This is our DevOps showcase.
+
+Phase 4 — Observability + Security ELK Stack for logs, Prometheus + Grafana for metrics, Wazuh for SIEM/security alerts. Hadoop security/VPN if I add Hadoop.
+
+Phase 5 — Disaster Recovery
+
+    Primary node failure → automatic failover to standby
+    S3 snapshots for backup, DynamoDB point-in-time recovery
+    Kubernetes pod rescheduling on node death
+    failure+recovery demo
+
+Suggested HPC problem statement: "Parallel climate data analysis: process satellite weather datasets stored on S3, preprocess via Lambda, run distributed simulation on Kubernetes-orchestrated MPI cluster, store results in DynamoDB, with full CI/CD, monitoring, and auto-recovery on node failure."

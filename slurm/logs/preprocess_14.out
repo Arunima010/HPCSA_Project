@@ -1,0 +1,30 @@
+=======================================
+ PREPROCESSING JOB STARTED
+ Host: compute1
+ Date: Sun Jul 26 06:53:45 PM UTC 2026
+=======================================
+============================================================
+Loading datasets...
+============================================================
+Transaction Shape : (590540, 394)
+Identity Shape : (144233, 41)
+
+Merging datasets on TransactionID...
+Merged Shape : (590540, 434)
+
+Saving merged dataset...
+Done.
+
+First 5 rows:
+   TransactionID  isFraud  ...  DeviceType                     DeviceInfo
+0        2987000        0  ...         NaN                            NaN
+1        2987001        0  ...         NaN                            NaN
+2        2987002        0  ...         NaN                            NaN
+3        2987003        0  ...         NaN                            NaN
+4        2987004        0  ...      mobile  SAMSUNG SM-G892A Build/NRD90M
+
+[5 rows x 434 columns]
+=======================================
+ PREPROCESSING COMPLETED
+ Date: Sun Jul 26 06:56:13 PM UTC 2026
+=======================================
