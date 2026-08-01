@@ -32,6 +32,28 @@ Known Legitimate Sample
 
 <hr>
 
+<h2>Distributed Batch Fraud Analysis</h2>
+
+<form action="/upload" method="POST" enctype="multipart/form-data">
+	
+	<label>Select Transaction CSV</label>
+
+	<br><br>
+
+	<input
+		type="file"
+		name="csvfile"
+		accept=".csv"
+		required>
+
+	<br><br>
+
+	<input
+		type="submit"
+		value="Upload CSV">
+
+</form>
+
 <p>
 The prediction is performed on a transaction from the validation dataset.
 </p>

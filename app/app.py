@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+from werkzeug.utils import secure_filename
 import psycopg2
 from psycopg2 import pool
 import time
@@ -24,30 +26,76 @@ model = joblib.load(MODEL_PATH)
 X_valid = pd.read_csv(BASE_DIR / "results" / "X_valid.csv")
 y_valid = pd.read_csv(BASE_DIR / "results" / "y_valid.csv").squeeze()
 
+encoders = joblib.load(BASE_DIR / "results" / "label_encoders.pkl")
+
 fraud_rows = y_valid[y_valid == 1].index.to_numpy()
 legit_rows = y_valid[y_valid == 0].index.to_numpy()
+
+all_predictions = model.predict(X_valid)
+
+correct_fraud_rows = y_valid[(y_valid == 1) & (all_predictions == 1)].index.to_numpy()
+
+correct_legit_rows = y_valid[(y_valid == 0) & (all_predictions == 0)].index.to_numpy()
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
 
+UPLOAD_FOLDER = BASE_DIR / "uploads"
+UPLOAD_FOLDER.mkdir(exist_ok=True)
+app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
+
 @app.route("/")
 def home():
     return render_template("index.html")
+
+@app.route("/upload", methods=["POST"])
+def upload_csv():
+
+    if "csvfile" not in request.files:
+        return "<h2>No file selected</h2>"
+
+    file = request.files["csvfile"]
+
+    if file.filename == "":
+        return "<h2>No file selected</h2>"
+
+    filename = secure_filename(file.filename)
+
+    filepath = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            filename
+    )
+    file.save(filepath)
+
+    return f"""
+    <h2>Upload Successful</h2>
+
+    <p>{filename}</p>
+
+    <a href="/">Back</a>
+    """
 
 @app.route("/predict", methods=["POST"])
 def predict():
     start = time.time()
 
     mode = request.form.get("mode","random")
+    sample_type = mode.replace("_"," ").title()
 
     if mode == "fraud":
-        idx = np.random.choice(fraud_rows)
+        if len(correct_fraud_rows):
+            idx = int(correct_fraud_rows[0])
+        else:
+            idx = int(fraud_rows[0])
     
     elif mode == "legitimate":
-        idx = np.random.choice(legit_rows)
+        if len(correct_legit_rows):
+            idx = int(correct_legit_rows[0])
+        else:
+            idx = int(legit_rows[0])
     
     else:
-        idx = np.random.choice(X_valid.index.to_numpy())
+        idx = 0
 
     sample = X_valid.loc[[idx]]
     sample_info = sample.iloc[0]
@@ -55,9 +103,20 @@ def predict():
     value = sample_info.get("TransactionAmt")
     transaction_amount = float(value) if pd.notna(value) else None
 
-    product = sample_info.get("ProductCD", "N/A")
+    product = sample_info.get("ProductCD")
 
-    card = str(sample_info.get("card4", "Unknown"))
+    card = sample_info.get("card4")
+
+    try:
+        product = encoders["ProductCD"].inverse_transform([int(product)])[0]
+    except Exception:
+        pass
+
+    try:
+        card = encoders["card4"].inverse_transform([int(card)])[0].title()
+    except Exception:
+        pass
+
     device = "Unknown"
     browser = "Unknown"
 
@@ -99,6 +158,7 @@ def predict():
         <hr>
 
         <h3>Transaction Details</h3>
+        <p><b>Sample Type:</b> {sample_type}</p>
 
         <u1>
         <li><b>Transaction Amount:</b> {transaction_amount}</li>

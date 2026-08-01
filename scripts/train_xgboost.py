@@ -27,19 +27,28 @@ y_train = pd.read_csv(f"{RESULT_DIR}/y_train.csv").squeeze()
 y_valid = pd.read_csv(f"{RESULT_DIR}/y_valid.csv").squeeze()
 
 print("Training Shape :", X_train.shape)
+
 print("Validation Shape :", X_valid.shape)
+fraud = (y_train == 1).sum()
+legit = (y_train == 0).sum()
+
+scale = legit / fraud
+print(f"Fraud samples :{fraud}")
+print(f"Legitimate samples : {legit}")
+print(f"scale_pos_weight :{scale:.2f}")
 
 print("\nTraining XGBoost Model...")
 
-model = xgb.XGBClassifier(n_estimators=300,max_depth=args.depth,learning_rate=args.lr,subsample=0.8,colsample_bytree=0.8,objective="binary:logistic",eval_metric="logloss",random_state=42,n_jobs=-1)
+model = xgb.XGBClassifier(n_estimators=500,max_depth=args.depth,learning_rate=args.lr,subsample=0.8,colsample_bytree=0.8,scale_pos_weight=scale,objective="binary:logistic",eval_metric="aucpr",random_state=42,n_jobs=-1)
 
 model.fit(X_train, y_train)
 
 print("Training Completed.")
 print("\nEvaluating Model...")
 
-pred = model.predict(X_valid)
-prob = model.predict_proba(X_valid)[:,1]
+prob = model.predict_proba(X_valid)[:, 1]
+threshold = 0.50
+pred = (prob >= threshold).astype(int)
 
 accuracy = accuracy_score(y_valid,pred)
 precision = precision_score(y_valid,pred)
