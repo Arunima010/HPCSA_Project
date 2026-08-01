@@ -24,6 +24,8 @@ MODEL_PATH = BASE_DIR / "models" / "xgboost_model.joblib"
 model = joblib.load(MODEL_PATH)
 
 X_valid = pd.read_csv(BASE_DIR / "results" / "X_valid.csv")
+EXPECTED_COLUMNS = X_valid.columns.tolist()
+
 y_valid = pd.read_csv(BASE_DIR / "results" / "y_valid.csv").squeeze()
 
 encoders = joblib.load(BASE_DIR / "results" / "label_encoders.pkl")
@@ -67,11 +69,44 @@ def upload_csv():
     )
     file.save(filepath)
 
+    try:
+        uploaded_df = pd.read_csv(filepath)
+    except Exception:
+        os.remove(filepath)
+        return """
+        <h2>Invalid CSV file.</h2>
+        <a href="/">Back</a>
+        """
+
+    uploaded_columns = uploaded_df.columns.tolist()
+    missing = [
+            c for c in EXPECTED_COLUMNS
+            if c not in uploaded_columns
+    ]
+    extra = [
+            c for c in uploaded_columns
+            if c not in EXPECTED_COLUMNS
+    ]
+
+    if missing:
+        os.remove(filepath)
+        return f"""
+        <h2>Invalid Dataset</h2>
+        <p><b>Missing Columns:</b></p>
+        <pre>{missing}</pre>
+        <a href="/">Back</a>
+        """
+
+
     return f"""
-    <h2>Upload Successful</h2>
+    <h2>CSV Validation Successful</h2>
+    <p><b>Filename:</b> {filename}</p>
+    <p><b>Rows:</b> {len(uploaded_df)}</p>
+    <p><b>Columns:</b> {len(uploaded_columns)}</p>
 
-    <p>{filename}</p>
-
+    <p style="color:green;">
+    Ready for HPC Processing
+    </p>
     <a href="/">Back</a>
     """
 
@@ -147,6 +182,7 @@ def predict():
 
                  )
             conn.commit()
+            print("Prediction successfully saved to PostgreSQL")
         
         finally:
             db_pool.putconn(conn)
