@@ -63,22 +63,20 @@ def upload_csv():
 
     filename = secure_filename(file.filename)
 
-    filepath = os.path.join(
-            app.config["UPLOAD_FOLDER"],
-            filename
-    )
+    filepath = UPLOAD_FOLDER / filename
+
     file.save(filepath)
 
     try:
-        uploaded_df = pd.read_csv(filepath)
+        df = pd.read_csv(filepath, nrows=5)
     except Exception:
-        os.remove(filepath)
+        filepath.unlink(missing_ok=True)
         return """
         <h2>Invalid CSV file.</h2>
-        <a href="/">Back</a>
-        """
+        <a href="/">Go Back</a>
+        """, 400
 
-    uploaded_columns = uploaded_df.columns.tolist()
+    uploaded_columns = df.columns.tolist()
     missing = [
             c for c in EXPECTED_COLUMNS
             if c not in uploaded_columns
@@ -95,13 +93,13 @@ def upload_csv():
         <p><b>Missing Columns:</b></p>
         <pre>{missing}</pre>
         <a href="/">Back</a>
-        """
+        """, 400
 
 
     return f"""
     <h2>CSV Validation Successful</h2>
     <p><b>Filename:</b> {filename}</p>
-    <p><b>Rows:</b> {len(uploaded_df)}</p>
+    <p><b>Rows:</b> {len(df)}</p>
     <p><b>Columns:</b> {len(uploaded_columns)}</p>
 
     <p style="color:green;">
