@@ -8,56 +8,33 @@
 
 <h1>HPC Fraud Detection Platform</h1>
 
+<h2>Sample Prediction</h2>
+
 <form action="/predict" method="post">
 
-<label>Transaction Amount</label><br>
-<input type="number" name="amount"><br><br>
+<label><b>Select Sample</b></label><br><br>
 
-<label>Card Type</label><br>
-<select name="card">
+<input type="radio" name="mode" value="random" checked>
+Random Transaction
+<br>
 
-<option>Visa</option>
-<option>MasterCard</option>
-<option>Discover</option>
+<input type="radio" name="mode" value="fraud">
+Known Fraud Sample
+<br>
 
-</select>
-
+<input type="radio" name="mode" value="legitimate">
+Known Legitimate Sample
 <br><br>
 
-<label>Device Type</label><br>
-
-<select name="device">
-
-<option>Desktop</option>
-<option>Mobile</option>
-
-</select>
-
-<br><br>
-
-<label>Browser</label><br>
-
-<select name="browser">
-
-<option>Chrome</option>
-<option>Firefox</option>
-<option>Edge</option>
-
-</select>
-
-<br><br>
-
-<label><b>Prediction Mode<b></label><br>
-
-<input type="radio" name="mode" value="random" checked>Random Transaction<br>
-
-<input type="radio" name="mode" value="fraud" checked>Known Fraud Sample<br>
-
-<input type="radio" name="mode" value="legitimate" checked>Known Legitimate Sample<br><br>
-
-<input type="submit" value="Predict Fraud">
+<input type="submit" value="Predict">
 
 </form>
+
+<hr>
+
+<p>
+The prediction is performed on a transaction from the validation dataset.
+</p>
 
 </body>
 </html>

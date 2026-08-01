@@ -38,6 +38,26 @@ def home():
 def predict():
     start = time.time()
 
+    try:
+        amount = float(request.form.get("amount", 0))
+        if amount <= 0:
+            return """
+            <h2>Transaction amount must be greater than zero.</h2>
+            <a href="/">Go Back</a>
+            """, 400
+        if amount > 100000000:
+            return """
+            <h2>Transaction amount seems unrealistic.</h2>
+            <a href="/">Go Back</a>
+            """, 400
+    except ValueError:
+        return """
+        <h2>Please enter a valid numeric amount.</h2>
+        <a href='/'>Go Back</a>
+        """,400
+    card = request.form.get("card","unknown")
+    device = request.form.get("device","unknown")
+    browser = request.form.get("browser","unknown")
     mode = request.form.get("mode","random")
 
     if mode == "fraud":
@@ -51,15 +71,8 @@ def predict():
 
     sample = X_valid.loc[[idx]]
     sample_info = sample.iloc[0]
-    
-    value = sample_info.get("TransactionAmt")
-    transaction_amount = float(value) if pd.notna(value) else None
-
+    transaction_amount = sample_info.get("TransactionAmt", "N/A")
     product = sample_info.get("ProductCD", "N/A")
-
-    card = str(sample_info.get("card4", "Unknown"))
-    device = "Unknown"
-    browser = "Unknown"
 
     try:
         prediction = int(model.predict(sample)[0])
@@ -67,7 +80,7 @@ def predict():
         
         result = "\U0001F6A8 Fraudulent Transaction" if prediction == 1 else "\u2705 Legitimate Transaction"
 
-        elapsed = float((time.time() - start) * 1000)
+        elapsed = (time.time() - start) * 1000
 
         conn = db_pool.getconn()
         try:
@@ -76,15 +89,7 @@ def predict():
                     """INSERT INTO prediction_logs(
                         transaction_amount,card_type,device_type,browser,prediction,fraud_probability,
                         response_time_ms) VALUES(%s, %s, %s, %s, %s, %s, %s)""",
-                        (
-                        float(transaction_amount) if transaction_amount is not None else None,
-                        str(card),
-                        str(device),
-                        str(browser),
-                        int(prediction),
-                        float(probability),
-                        float(elapsed)
-                        )
+                        (amount,card,device,browser,prediction,probability,elapsed)
 
                  )
             conn.commit()
@@ -103,9 +108,6 @@ def predict():
         <u1>
         <li><b>Transaction Amount:</b> {transaction_amount}</li>
         <li><b>Product:</b> {product}</li>
-        <li><b>Card:</b> {card}</li>
-        <li><b>Device:</b> {device}</li>
-        <li><b>Browser:</b> {browser}</li>
         <li><b>Prediction Time:</b> {elapsed:.2f} ms</li>
         </u1>
 
