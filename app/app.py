@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 import os
 from werkzeug.utils import secure_filename
@@ -9,6 +10,7 @@ from flask import Flask, render_template, request
 import joblib
 import pandas as pd
 import numpy as np
+import json
 
 db_pool = pool.SimpleConnectionPool(
         1, 20,
@@ -45,6 +47,36 @@ metrics = PrometheusMetrics(app)
 UPLOAD_FOLDER = BASE_DIR / "uploads"
 UPLOAD_FOLDER.mkdir(exist_ok=True)
 app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
+
+
+def split_dataset(df):
+    with open(BASE_DIR / "config" / "cluster.json") as f:
+        config = json.load(f)
+
+    nodes = config["compute_nodes"]
+    chunk_size = len(df) // nodes
+    chunk_dir = BASE_DIR / "chunks"
+    chunk_dir.mkdir(exist_ok=True)
+    
+    for file in chunk_dir.glob("chunk_*.csv"):
+        file.unlink()
+
+    chunk_files = []
+
+    for i in range(nodes):
+        start = i * chunk_size
+        if i == nodes - 1:
+            end = len(df)
+        else:
+            end = (i + 1) * chunk_size
+
+        chunk = df.iloc[start:end]
+        filename = chunk_dir / f"chunk_{i+1}.csv"
+        chunk.to_csv(filename, index=False)
+        chunk_files.append(filename)
+    
+    return chunk_files
+
 
 @app.route("/")
 def home():
@@ -95,12 +127,21 @@ def upload_csv():
         <a href="/">Back</a>
         """, 400
 
+    # HPC Processing Starts Here
+
+    uploaded_df = pd.read_csv(filepath)
+    chunk_files = split_dataset(uploaded_df)
+
+    for chunk in chunk_files:
+        subprocess.run(["sbatch",str(BASE_DIR / "slurm" / "predict_chunk.sh"),str(chunk)])
+
 
     return f"""
     <h2>CSV Validation Successful</h2>
     <p><b>Filename:</b> {filename}</p>
-    <p><b>Rows:</b> {len(df)}</p>
+    <p><b>Rows:</b> {len(uploaded_df)}</p>
     <p><b>Columns:</b> {len(uploaded_columns)}</p>
+    <p><b>Chunks Created:</b> {len(chunk_files)}</p>
 
     <p style="color:green;">
     Ready for HPC Processing
