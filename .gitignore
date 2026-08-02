@@ -13,3 +13,37 @@ results/
 archive/
 
 models/
+
+# Python
+
+__pycache__/
+
+*.pyc
+
+# Virtual Environment
+
+fraud_env/
+
+# Runtime files
+
+logs/*
+
+uploads/*
+
+chunks/*
+
+predictions/*
+
+merged/*
+
+# Keep folder structure
+
+!logs/.gitkeep
+
+!uploads/.gitkeep
+
+!chunks/.gitkeep
+
+!predictions/.gitkeep
+
+!merged/.gitkeep
