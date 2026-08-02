@@ -6,10 +6,11 @@ import psycopg2
 from psycopg2 import pool
 import time
 from prometheus_flask_exporter import PrometheusMetrics
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 import joblib
 import pandas as pd
 import numpy as np
+
 import json
 
 db_pool = pool.SimpleConnectionPool(
@@ -130,22 +131,74 @@ def upload_csv():
     # HPC Processing Starts Here
 
     uploaded_df = pd.read_csv(filepath)
+
+    batch_start = time.time()
+
     chunk_files = split_dataset(uploaded_df)
 
-    for chunk in chunk_files:
-        subprocess.run(["sbatch",str(BASE_DIR / "slurm" / "predict_chunk.sh"),str(chunk)])
+    job_ids = []
 
+    for chunk in chunk_files:
+        result = subprocess.run(["sbatch",str(BASE_DIR / "slurm" / "predict_chunk.sh"),str(chunk)],capture_output=True,text=True)
+        job_id = result.stdout.strip().split()[-1]
+        job_ids.append(job_id)
+
+    while True:
+        running = False
+        for job in job_ids:
+            check = subprocess.run(["squeue","-j",job],capture_output=True,text=True)
+            if job in check.stdout:
+                running = True
+                break
+        if not running:
+            break
+        time.sleep(2)
+    subprocess.run(["python3",str(BASE_DIR / "scripts" / "merge_predictions.py")])
+    
+    batch_end = time.time()
+    execution_time = batch_end - batch_start
+
+    conn = db_pool.getconn()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                    """
+                    INSERT INTO batch_jobs
+                    (filename,total_rows,chunks,completed_at,execution_time,status)
+                    VALUES
+                    (%s, %s, %s, NOW(), %s, %s)
+                    """,
+                    (
+                        filename,len(uploaded_df),len(chunk_files),execution_time,"Completed"
+                    )
+            )
+        conn.commit()
+    finally:
+        db_pool.putconn(conn)
 
     return f"""
-    <h2>CSV Validation Successful</h2>
+    <h2>Distribution Batch Analysis Complete</h2>
     <p><b>Filename:</b> {filename}</p>
     <p><b>Rows:</b> {len(uploaded_df)}</p>
     <p><b>Columns:</b> {len(uploaded_columns)}</p>
     <p><b>Chunks Created:</b> {len(chunk_files)}</p>
 
     <p style="color:green;">
-    Ready for HPC Processing
+    Predictions generated successfully.
     </p>
+
+    <p style="color:green;">
+    Results merged successfully.
+    </p>
+
+    <a href="/download">
+    <button>Download Predictions CSV</button>
+    </a>
+
+    <br><br>
+    
+    <a href="/">Analyze Another Dataset</a>
+
     <a href="/">Back</a>
     """
 
@@ -249,6 +302,11 @@ def predict():
         """
     except Exception as e: 
         return f"<h2>Prediction Error: {e}</h2><a href="/">Go Back</a>", 500
+
+@app.route("/download")
+def download():
+    return send_file(BASE_DIR / "merged" / "predictions.csv",as_attachment = True)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050)
