@@ -1,73 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HPC Fraud Detection Platform</title>
+	<meta charset="UTF-8">
+	<title>HPC Fraud Detection Platform & Monitoring Platform</title>
+
+	<!--Bootstrap CSS -->
+	<link
+		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+		rel="stylesheet">
+	<!-- Custom CSS -->
+	<link
+		rel="stylesheet"
+		href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
-<body>
+<body class="bg-light>
+	<div class="container-fluid px-5 py-4">
+		<div class="test-center mb-5">
+			<h1 class="display-4 fw-bold text-primary">&#x1F5A5;&#xFE0F; HPC Fraud Detection Platform</h1>
+			<p class="lead text-muted">
+				Distributed Fraud Detection using SLURM &#x2022; XGBoost &#x2022; Prometheus &#x2022; 
+				Grafana
+			</p>
+		</div>
 
-<h1>HPC Fraud Detection Platform</h1>
+		<div class="row">
+			<div class="col-md-6 mb-4">
+				<div class="card shadow>
+					<div class="card-header bg-primary text-white">
+						<h4>&#x1F50D; Quick Prediction</h4>
+					</div>
 
-<h2>Sample Prediction</h2>
+					<div class="card-body">
+						<form action="/predict" method="post">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="mode" value="random" checked>
+				                                <label class="form-check-label">Random Transaction</label>
+				                        </div>
 
-<form action="/predict" method="post">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="mode" value="fraud">
+				                                <label class="form-check-label">Known Fraud Sample</label>
+					                 </div>
+				                         <div class="form-check">
+								 <input class="form-check-input" type="radio" name="mode" value="legitimate">
+				                           	 <label class="form-check-label">Known Legitimate Sample</label>
+				                         </div>
+				                         <br>
+				                         <button class="btn btn-primary w-100" type="submit">
+								 Predict Transaction
+							 </button>
 
-<label><b>Select Sample</b></label><br><br>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-md-6 mb-4">
+				<div class="card shadow">
+					<div class="card-header bg-success text-white">
+						<h4>&#x1F4E4; Distributed Batch Fraud Analysis</h4>
+					</div>
+					<div class="card-body">
+						<form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+							<input class="form-control" type="file" name="csvfile" accept=".csv" required>
+							<br>
+							<button class="btn btn-success w-100" type="submit">
+								&#x1F4E4; Upload &amp; Analyze
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 
-<input type="radio" name="mode" value="random" checked>
-Random Transaction
-<br>
-
-<input type="radio" name="mode" value="fraud">
-Known Fraud Sample
-<br>
-
-<input type="radio" name="mode" value="legitimate">
-Known Legitimate Sample
-<br><br>
-
-<input type="submit" value="Predict">
-
-</form>
-
-<hr>
-
-<h2>Distributed Batch Fraud Analysis</h2>
-
-<form action="/upload" method="POST" enctype="multipart/form-data">
-	
-	<label>Select Transaction CSV</label>
-
-	<br><br>
-
-	<input
-		type="file"
-		name="csvfile"
-		accept=".csv"
-		required>
-
-	<br><br>
-
-	<input
-		type="submit"
-		value="Upload CSV">
-
-</form>
-
-<!--Loading Overlay -->
-<div id="loadingOverlay" style="display:none;">
-	<div class="loading-box">
-		<div class="spinner"></div>
-		<h2>Running HPC Fraud Detection</h2>
-		<p id="statusText">Reading CSV...</p>
-		<h1 id="timer">00:00</h1>
+		<div class="card shadow h-100">
+			<div class="card-body h-100">
+				<h4 class="text-center mb-4">&#x1F680; Platform Features</h4>
+			<div class="row justify-content-center text-center">
+				 <div class="col-md-4 mb-3">&#x2705; Distributed HPC Processing</div>
+				 <div class="col-md-4 mb-3">&#x2705; SLURM Scheduling</div>
+				 <div class="col-md-4 mb-3">&#x2705; XGBoost Prediction</div>
+				 <div class="col-md-4 mb-3">&#x2705; PostgreSQL Logging</div>
+				 <div class="col-md-4 mb-3">&#x2705; Prometheus Monitoring</div>
+				 <div class="col-md-4 mb-3">&#x2705; Grafana Dashboard</div>
+				 <div class="col-md-4 mb-3">&#x2705; Alertmanager</div>
+				 <div class="col-md-4 mb-3">&#x2705; Slack Notifications</div>
+			</div>
+		</div>
 	</div>
+
+	<footer class="text-center text-muted mt-5">
+		Developed using Flask &#x2022; SLURM &#x2022; XGBoost &#x2022; PostgreSQL &#x2022; Prometheus &#x2022; Grafana
+	</footer>
 </div>
 
-
-<p>
-The prediction is performed on a transaction from the validation dataset.
-</p>
+<div id="loadingOverlay" class="overlay">
+	<div class="loading-card">
+		<h2>&#x1F5A5;&#xFE0F; HPC Fraud Detection Running</h2>
+		<p>Please wait while the HPC cluster processes your dataset.</p>
+		<div class="spinner-border text-primary mb-3" style="width:70px;height:70px;" role="status"></div>
+		<h3 id="timer">&#x23F1;&#xFE0F; 00:00</h3>
+		<hr>
+	        <div id="steps">
+			<p id="step1">&#x1F4C4; Reading CSV Dataset</p>
+	                <p id="step2">&#x1F50D; Validating Dataset Schema</p>
+		        <p id="step3">&#x2702;&#xFE0F; Splitting Dataset into Chunks</p>
+	                <p id="step4">&#x1F4C5; Scheduling Slurm Jobs</p>
+	            	<p id="step5">&#x1F5A5;&#xFE0F; Processing on Compute Node 1</p>
+	                <p id="step6">&#x1F5A5;&#xFE0F; Processing on Compute Node 2</p>
+			<p id="step7">&#x1F6A8; Merging Prediction Results</p>
+		        <p id="step8">&#x1F5C4;&#xFE0F; Updating PostgreSQL Logs</p>
+			<p id="step9">&#x1F4CA; Updating Prometheus Metrics</p>
+			<p id="step10">&#x1F4AC; Sending Slack Notification</p>
+			<p id="step11">&#x2705; Completed</p>
+		</div>
+	</div>
+</div>
 
 </body>
 </html>
