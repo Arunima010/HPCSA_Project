@@ -3,6 +3,41 @@
 <head>
 	<meta charset="UTF-8">
 	<title>HPC Fraud Detection Platform & Monitoring Platform</title>
+	
+	<div class="card shadow mb-4 status-card">
+	<div class="card-header bg-dark text-white">
+	&#x1F5A5;&#xFE0F; HPC Cluster Status
+	</div>
+	<div class="card-body">
+	<div class="row">
+
+	<div class="col-md-4">
+	&#x1F7E2; Head Node
+	</div>
+
+	<div class="col-md-4">
+        &#x1F7E2; Compute Node 1
+        </div>
+
+	<div class="col-md-4">
+        &#x1F7E2; Compute Node 2
+        </div>
+
+	<div class="col-md-4 mt-3">
+        &#x1F7E2; PostgreSQL
+        </div>
+
+	<div class="col-md-4 mt-3">
+        &#x1F7E2; Prometheus
+        </div>
+
+	<div class="col-md-4 mt-3">
+        &#x1F7E2; Grafana
+        </div>
+	</div>
+	</div>
+	</div>
+
 
 	<!--Bootstrap CSS -->
 	<link
@@ -103,20 +138,30 @@
 		<h3 id="timer">&#x23F1;&#xFE0F; 00:00</h3>
 		<hr>
 	        <div id="steps">
-			<p id="step1">&#x1F4C4; Reading CSV Dataset</p>
-	                <p id="step2">&#x1F50D; Validating Dataset Schema</p>
-		        <p id="step3">&#x2702;&#xFE0F; Splitting Dataset into Chunks</p>
-	                <p id="step4">&#x1F4C5; Scheduling Slurm Jobs</p>
-	            	<p id="step5">&#x1F5A5;&#xFE0F; Processing on Compute Node 1</p>
-	                <p id="step6">&#x1F5A5;&#xFE0F; Processing on Compute Node 2</p>
-			<p id="step7">&#x1F6A8; Merging Prediction Results</p>
-		        <p id="step8">&#x1F5C4;&#xFE0F; Updating PostgreSQL Logs</p>
-			<p id="step9">&#x1F4CA; Updating Prometheus Metrics</p>
-			<p id="step10">&#x1F4AC; Sending Slack Notification</p>
-			<p id="step11">&#x2705; Completed</p>
+			<div class="progress mb-4">
+			<div
+			id="progressBar"
+			class="progress-bar progress-bar-striped progress-bar-animated"
+			style="width:0%">
+			0%
+			</div>
+			</div>
+			<p id="step1" class="step waiting">&#x1F4C4; Reading CSV Dataset</p>
+	                <p id="step2" class="step waiting">&#x1F50D; Validating Dataset Schema</p>
+		        <p id="step3" class="step waiting">&#x2702;&#xFE0F; Splitting Dataset into Chunks</p>
+	                <p id="step4" class="step waiting">&#x1F4C5; Scheduling Slurm Jobs</p>
+	            	<p id="step5" class="step waiting">&#x1F5A5;&#xFE0F; Processing on Compute Node 1</p>
+	                <p id="step6" class="step waiting">&#x1F5A5;&#xFE0F; Processing on Compute Node 2</p>
+			<p id="step7" class="step waiting">&#x1F6A8; Merging Prediction Results</p>
+		        <p id="step8" class="step waiting">&#x1F5C4;&#xFE0F; Updating PostgreSQL Logs</p>
+			<p id="step9" class="step waiting">&#x1F4CA; Updating Prometheus Metrics</p>
+			<p id="step10" class="step waiting">&#x1F4AC; Sending Slack Notification</p>
+			<p id="step11" class="step waiting">&#x1F389; Completed</p>
 		</div>
 	</div>
 </div>
+
+<script src="{{ url_for('static', filename='js/loading.js') }}"></script>
 
 </body>
 </html>
