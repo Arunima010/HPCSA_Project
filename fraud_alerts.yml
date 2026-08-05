@@ -1,0 +1,32 @@
+groups:
+- name: FraudDetectionAlerts
+  rules:
+  - alert: FlaskApplicationDown
+    expr: up{job="fraud-api"} == 0
+    for: 30s
+
+    labels:
+      severity: critical
+
+    annotations:
+      summary: "Flask application is DOWN"
+      description: "Fraud Detection application is unreachable."
+
+  - alert: HighPredictionLatency
+    expr: flask_http_request_duration_seconds_sum > 5
+    for: 1m
+
+    labels:
+      severity: warning
+    annotations:
+      summary: "High prediction latency"
+      description: "Prediction response time is above threshold."
+
+  - alert: TestWebhook
+    expr: vector(1)
+    for: 10s
+    labels:
+      severity: warning
+    annotations:
+      summary: "Webhook Test"
+      description: "Testing Alertmanager webhook integration"
