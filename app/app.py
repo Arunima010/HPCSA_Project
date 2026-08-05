@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 import psycopg2
 from psycopg2 import pool
 import time
-from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_flask_exporter import PrometheusMetrics, Gauge
 from flask import Flask, render_template, request, send_file, jsonify
 import joblib
 import pandas as pd
@@ -44,6 +44,8 @@ correct_legit_rows = y_valid[(y_valid == 0) & (all_predictions == 0)].index.to_n
 
 app = Flask(__name__)
 metrics = PrometheusMetrics(app)
+
+fraud_transactions_total = Gauge("fraud_transactions_total","Number of fraudulent transactions in latest batch")
 
 UPLOAD_FOLDER = BASE_DIR / "uploads"
 UPLOAD_FOLDER.mkdir(exist_ok=True)
@@ -154,6 +156,13 @@ def upload_csv():
             break
         time.sleep(2)
     subprocess.run(["python3",str(BASE_DIR / "scripts" / "merge_predictions.py")])
+
+    merged_df = pd.read_csv(BASE_DIR / "merged" / "predictions.csv")
+    fraud_count = int(merged_df["Prediction"].sum())
+    fraud_transactions_total.set(fraud_count)
+    print("=" * 50)
+    print(f"Fraud Count = {fraud_count}")
+    print("=" * 50)
     
     batch_end = time.time()
     execution_time = batch_end - batch_start
