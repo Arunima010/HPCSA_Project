@@ -6,7 +6,7 @@ import psycopg2
 from psycopg2 import pool
 import time
 from prometheus_flask_exporter import PrometheusMetrics
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 import joblib
 import pandas as pd
 import numpy as np
@@ -307,6 +307,15 @@ def predict():
 def download():
     return send_file(BASE_DIR / "merged" / "predictions.csv",as_attachment = True)
 
+@app.route("/webhook",methods=["POST"])
+def webhook():
+    data = request.json
+    print("="*50)
+    print("Alert Received")
+    print(data)
+    print("="*50)
+
+    return jsonify({"status":"success"}),200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5050)
