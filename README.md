@@ -1,4 +1,4 @@
-## Real-Time Fraud Detection on an HPC Cluster
+## HPC-Based Distributed Fraud Detection and Monitoring Platform
 
 A High Performance Computing (HPC) based fraud detection system that uses a virtual cluster to process financial transactions in parallel using machine learning.
 
