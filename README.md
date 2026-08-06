@@ -2,6 +2,11 @@
 
 A High Performance Computing (HPC) based fraud detection system that uses a virtual cluster to process financial transactions in parallel using machine learning.
 
+<img width="400" height="204" alt="Screen Recording 2026-08-05 211729" src="https://github.com/user-attachments/assets/0a83c5c1-107f-4ca8-add1-33f00702deac" />
+
+
+
+
 ## Features
 
 - HPC cluster with Headnode and Compute Nodes
