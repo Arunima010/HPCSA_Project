@@ -60,5 +60,5 @@ Transactions
 
 ---
 
-**Author:** Arunima Mukhopadhyay, Swaroop Patil
+**Author:** Arunima Mukhopadhyay
 **Course:** PG-DAC HPCSA, C-DAC Pune
